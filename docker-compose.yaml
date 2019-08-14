@@ -1,0 +1,27 @@
+version: '3'
+services: 
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+  consumers:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 3
+    volumes: 
+      - ".:/app"
+    command: ["python", "consumer.py", "#"]
+    depends_on: 
+      - rabbitmq
+  producer:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ".:/app"
+    command: ["python", "producer.py"]
+    depends_on: 
+      - rabbitmq
+      - consumers
